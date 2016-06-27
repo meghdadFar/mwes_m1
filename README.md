@@ -55,16 +55,6 @@ other options:
 -ignoreCase: Whether (1) or not (0) ignore case (default value = 1).
 
 
-SampleFiles:
-=======================================================
-
-- wiki.pos.sample.txt: A sample of POS Tagged 2015 English Wikipedia
-- examples.pos.csv: Set of labeled examples extracted from Wikipedia. 
-- labels.csv: class Labels of the examples based on the judgments of four experts.
-
-Labeled data from: Meghdad Farahmand, Aaron Smith, and Joakim Nivre. A Multiword Expression Data Set: Annotating Non-Compositionality and Conventionalization for English Noun Compounds, In Proceedings of the 11th Workshop on Multiword Expressions, North American Chapter of ACL (MWE-NAACL 2015). Denver, USA, June 2015.
-
-
 Notes:
 =======================================================
 
