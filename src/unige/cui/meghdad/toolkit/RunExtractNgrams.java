@@ -174,7 +174,6 @@ public class RunExtractNgrams {
             Writer b = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(ngrDir + "/" + String.valueOf(order) + "-grams-gte-" + freqTh+".txt"), "UTF-8"));
             
-            
             //write without POS
               for (String ngPlain : finalNgs.keySet()) {
                   b.write(ngPlain + " " + finalNgs.get(ngPlain) + "\n");

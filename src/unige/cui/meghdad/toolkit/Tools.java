@@ -135,6 +135,8 @@ public class Tools {
                 System.out.println("-----------------------------------");
 
             }
+            
+            System.out.println("SIZE OF HC: "+hc.size());
 
             //reproduce the POS tagged compound with most frequent tags
             String[] tags = hc.get(ngr).getTags().get(ind_max).split(" ");
@@ -154,6 +156,65 @@ public class Tools {
         return outMap;
     }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     * 
+     * Method to merge the POS tags of the input HashMap of pos tagged 
+     * word pairs and their frequency. 
+     * 
+     * The method can be used to merge the compounds that are tagged differently. 
+     * e.g. bank_NN account_NN or bank_NN account_NNP
+     * 
+     * @param input HashMap<String, Integer>: asphalt_nn emulsions_nns 2
+     * @return HashMap<String, Integer>: asphalt emulsions 2
+     */
+    
+    
+    
+ 
+    //============================================================================
+    //============================================================================
+    public HashMap MergePosTags(HashMap<String, Integer> input) {
+
+        
+        //output
+        HashMap<String, Integer> outMap = new HashMap<String, Integer>();
+        
+        
+        for (String k : input.keySet()) {
+            String[] elements = k.split("[ _]");
+            
+            String pairForm = elements[0]+" "+elements[2];
+            int pairFreq = input.get(k);
+            
+            if(!outMap.containsKey(pairForm)){
+                outMap.put(pairForm, pairFreq);
+            }else{
+                int prevFreq = outMap.get(pairForm);
+                int newFreq = prevFreq+pairFreq;
+                outMap.put(pairForm, newFreq);
+            }
+        }
+        return outMap;
+    }
+    
+   
+     
+    
     //============================================================================
     //============================================================================
     /**
@@ -438,8 +499,6 @@ public class Tools {
         System.out.println("Returning Map of Ngramgs.");
         return returnNgs;
 
-
-
     }
 
     //============================================================================
@@ -481,7 +540,7 @@ public class Tools {
             //using positive lookahead: (?=mypattern) identifies the overlapping patterns:
             //car_NN engine_NN mechanic_NN --> car_NN engine_NN, engine_NN mechanic_NN
             //without positive lookahead: car_NN engine_NN
-            cmpPat = Pattern.compile("(?=\\b(\\p{Alpha}+)_(NNS?)\\s(\\p{Alpha}+)_(NNS?)\\b).");
+            cmpPat = Pattern.compile("(?=\\b(\\p{Alpha}+)_([Nn][Nn][Ss]?)\\s(\\p{Alpha}+)_([Nn][Nn][Ss]?)\\b).");
         } else if (SyntacticPattern.equals("jj-nn")) {
             cmpPat = Pattern.compile("(?=\\b(\\w+)_(JJ(R|S)?)\\s(\\w+)_(NNS?)\\b).");
         } else {
@@ -493,11 +552,11 @@ public class Tools {
         int sent_count = 0;
         String l = "";
         while ((l = corpus.readLine()) != null) {
-
+            
             sent_count++;
-//            if ((sent_count % 1000000) == 0) {
-//                System.out.println("Processing line: " + sent_count);
-//            }
+            if ((sent_count % 1000000) == 0) {
+                System.out.println("Processing line: " + sent_count);
+            }
             Matcher m_nc = cmpPat.matcher(l);
             while (m_nc.find()) {
 
@@ -507,7 +566,6 @@ public class Tools {
                 //String cat = m_nc.group(1).toLowerCase() + "_" + m_nc.group(2) + " " + m_nc.group(3).toLowerCase() + "_" + m_nc.group(4);
                 String cat = m_nc.group(1) + "_" + m_nc.group(2) + " " + m_nc.group(3) + "_" + m_nc.group(4);
 
-//                System.out.println(cat);
                 if (igCase) {
                     cat = cat.toLowerCase();
                 }
@@ -519,7 +577,6 @@ public class Tools {
 //                System.out.println(cat);
                 if (!NCs.containsKey(cat)) {
                     NCs.put(cat, 1);
-//                            System.out.println("NC: " + cat);
                 } else if (NCs.containsKey(cat)) {
                     int tmp_count_nc = NCs.get(cat);
                     tmp_count_nc++;
@@ -527,6 +584,12 @@ public class Tools {
                 }
             }
         }
+        
+        
         return NCs;
     }
+    
+    
+    
+    
 }

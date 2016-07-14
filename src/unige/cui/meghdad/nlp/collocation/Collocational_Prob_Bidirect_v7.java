@@ -270,22 +270,15 @@ public class Collocational_Prob_Bidirect_v7 {
                     
                     numOfProcessed++;
 
-                    //without smoothing:
-                    double RIGHTw2w1 = w2w1RnumSigma / w2w1RdenumSigma;
-                    Pw2SynsetW1 = RIGHTw2w1;
-                    double RIGHTw1w2 = w1w2RnumSigma / w1w2RdenumSigma;
-                    Pw1SynsetW2 = RIGHTw1w2;
-                    
-                    //with smoothing:
-                    
-//                    double RIGHTw2w1 = w2w1RnumSigma+1 / w2w1RdenumSigma + unigramHM.size();
-//                    Pw2SynsetW1 = RIGHTw2w1;
-//                    double RIGHTw1w2 = w1w2RnumSigma+1 / w1w2RdenumSigma + unigramHM.size();
-//                    Pw1SynsetW2 = RIGHTw1w2;
                     
 
-//                    System.out.println(df.format(PW2W1)+" ? "+df.format(Pw2SynsetW1));
-                    
+                //smoothing numerator: w1w2RnumSigma denominator: bigramHM.size()
+                Pw1SynsetW2 = (double) (w1w2RnumSigma) / (double) (w1w2RdenumSigma + bigramHM.size());
+                Pw2SynsetW1 = (double) (w2w1RnumSigma) / (double) (w2w1RdenumSigma + bigramHM.size());
+                
+                
+                
+                
                 //==================================================
                 //=================== evaluation ===================
                 //==================================================

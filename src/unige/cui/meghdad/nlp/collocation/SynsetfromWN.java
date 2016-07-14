@@ -18,6 +18,7 @@ public class SynsetfromWN {
 
     public int CountSyns(String argOne,String argTwo) {
         
+        
         System.setProperty("wordnet.database.dir", "./WordNet-3.0/dict");
         HashMap<String,String> allSynonyms = new HashMap<String,String>();
         String wordForm = argOne.toLowerCase();
@@ -55,7 +56,9 @@ public class SynsetfromWN {
     
     
     public List<String> ReturnSyns(String argOne,String argTwo) {
-         System.setProperty("wordnet.database.dir", "./WordNet-3.0/dict");
+        
+        
+        System.setProperty("wordnet.database.dir", "./WordNet-3.0/dict");
         HashMap<String,String> allSynonyms = new HashMap<String,String>();
         String wordForm = argOne.toLowerCase();
         String senType = argTwo;
