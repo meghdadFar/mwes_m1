@@ -139,9 +139,12 @@ public class Collocational_Prob_Bidirect_v8 {
                 
                 Ldenumw1w2 = unigramHM.get(w2t2[0]);
                 //maximum likelihood estimation for P(w2|w1) and P(w1|w2)
-                PW2W1 = (double) (Lnumw2w1+1.0) / (double) (Ldenumw2w1 + bigramHM.size());
-                PW1W2 = (double) (Lnumw1w2+1.0) / (double) (Ldenumw1w2 +bigramHM.size());
-
+                //smoothing
+//                PW2W1 = (double) (Lnumw2w1+1.0) / (double) (Ldenumw2w1 + bigramHM.size());
+//                PW1W2 = (double) (Lnumw1w2+1.0) / (double) (Ldenumw1w2 +bigramHM.size());
+                //w/o smoothing
+                PW2W1 = (double) (Lnumw2w1) / (double) (Ldenumw2w1);
+                PW1W2 = (double) (Lnumw1w2) / (double) (Ldenumw1w2);
 
 
                 lll = true;
@@ -222,7 +225,7 @@ public class Collocational_Prob_Bidirect_v8 {
                     if (bigramHM.containsKey(compound)) {
                         w2w1RnumSigma += bigramHM.get(compound);
                         //smoothing
-                        w2w1RnumSigma++;
+                        //w2w1RnumSigma++;
                         
                     } else {
                     }
@@ -241,7 +244,7 @@ public class Collocational_Prob_Bidirect_v8 {
                     if (bigramHM.containsKey(compound)) {
                         w1w2RnumSigma += bigramHM.get(compound);
                         //smoothing
-                        w1w2RnumSigma++;
+                        //w1w2RnumSigma++;
                     } else {
                     }
                     if (unigramHM.containsKey(o)) {
@@ -280,9 +283,14 @@ public class Collocational_Prob_Bidirect_v8 {
                 
   
                 //System.out.println(NC+" "+ncCount + " "+ w1Count + " "+w2Count);
-                Pw1SynsetW2 = (double) (w1w2RnumSigma) / (double) (w1w2RdenumSigma + bigramHM.size());
-                Pw2SynsetW1 = (double) (w2w1RnumSigma) / (double) (w2w1RdenumSigma + bigramHM.size());
+                //smoothing
+//                Pw1SynsetW2 = (double) (w1w2RnumSigma) / (double) (w1w2RdenumSigma + bigramHM.size());
+//                Pw2SynsetW1 = (double) (w2w1RnumSigma) / (double) (w2w1RdenumSigma + bigramHM.size());
 
+                //w/o smoothing
+                Pw1SynsetW2 = (double) (w1w2RnumSigma) / (double) (w1w2RdenumSigma);
+                Pw2SynsetW1 = (double) (w2w1RnumSigma) / (double) (w2w1RdenumSigma);
+                
                 
 
                 //System.out.println(NC + " " + PW1W2 + " " + PW2W1 + " " + Pw1SynsetW2 + " " + Pw2SynsetW1);
@@ -309,13 +317,250 @@ public class Collocational_Prob_Bidirect_v8 {
     
     
     
+    
+    
+    
+    
+    
+    //================================================================= 
+    //=================================================================
+    /**
+     * Method to return p(w1|w2), p(w2|w1), p(w1|syn(w2)) and p(w2|syn(w1)) for
+     * posLabeledCandidates. 
+     * 
+     * In this version I corrected the calculation of p(w1|syn(w2)) 
+     * and p(w2|syn(w1)) probabilities. 
+     *
+     *
+     * @param igCase ignore case
+     * 
+     * @return LinkedHashMap<String,Double[]> that contains NCs and their p(w1|w2), p(w2|w1),
+     * p(w1|syn(w2)) and p(w2|syn(w1)).
+     *
+     * @throws IOException
+     */
+    //================================================================= 
+    //=================================================================
+    public LinkedHashMap<String,Double[]> calculateSynBasedProbs_v2(boolean igCase) throws IOException {
+
+        //initializing confusion matrix elements and return values: precision, recall, etc. 
+        numOfProcessed = 0;
+        DecimalFormat df = new DecimalFormat("0.0000");
+
+        
+        
+        LinkedHashMap<String,Double[]> results = new LinkedHashMap();
+        
+        
+        
+
+        //for each NC (candidate noun compound) do:
+        for (String NCetTags : posCandList.keySet()) {
+            
+            //System.out.println(NCetTags);
+
+
+            //declare and init numerator and denominator of the left side of inequality P(w2|w1) > P(w2|Synset(w1))
+            double Lnumw2w1 = 0;
+            double Ldenumw2w1 = 0;
+            //declare and init numerator and denominator of the left side of inequality P(w1|w2) > P(w1|Synset(w2))
+            double Lnumw1w2 = 0;
+            double Ldenumw1w2 = 0;
+
+            //P(w2|w1)
+            double PW2W1 = 0;
+            //P(w2|Synset(w1))
+            double Pw2SynsetW1 = 0;
+
+            //P(w1|w2)
+            double PW1W2 = 0;
+            //P(w1|Synset(w2))
+            double Pw1SynsetW2 = 0;
+
+            if (igCase) {
+                NCetTags = NCetTags.toLowerCase();
+            }
+            //NPetTags format: Labour_NNP Party_NNP
+            //split this postagged bigram into its components and their tags
+            String[] WsTs = NCetTags.split(" ");
+            String[] w1t1 = WsTs[0].split("_");
+            String[] w2t2 = WsTs[1].split("_");
+
+            //create untagged bigram
+            String NC = w1t1[0] + " " + w2t2[0];
+            //System.out.println(NC);
+
+            /*
+             calculate PW1W2 and PW2W1.
+             lll is flag to show wether or not p(w2|w1) and p(w1|w2) could be created. i.e., w1 and w2 
+             exist in the unigramHM and w1w2 exists in the bigramHM.
+             */
+            boolean lll = false;
+            if (unigramHM.containsKey(w1t1[0])
+                    && unigramHM.containsKey(w2t2[0])) {
+//                System.out.println(NC+" was numOfProcessed in bigram list");
+//                System.out.println(w1t1[0]+" was numOfProcessed in unigram list");
+
+                Lnumw2w1 = posCandList.get(NCetTags);
+                Lnumw1w2 = Lnumw2w1;
+
+                Ldenumw2w1 = unigramHM.get(w1t1[0]);
+                
+                Ldenumw1w2 = unigramHM.get(w2t2[0]);
+                //maximum likelihood estimation for P(w2|w1) and P(w1|w2)
+                //smoothing
+//                PW2W1 = (double) (Lnumw2w1+1.0) / (double) (Ldenumw2w1 + bigramHM.size());
+//                PW1W2 = (double) (Lnumw1w2+1.0) / (double) (Ldenumw1w2 +bigramHM.size());
+                //w/o smoothing
+                PW2W1 = (double) (Lnumw2w1) / (double) (Ldenumw2w1);
+                PW1W2 = (double) (Lnumw1w2) / (double) (Ldenumw1w2);
+
+
+                lll = true;
+
+            } else {
+
+                /*
+                 either of w1 or w2 was not found in the corpus therefore 
+                 division by zero due to unavailble denominator count.
+                 */
+                lll = false;
+
+            }
+            /*
+             if the p(w2|w1) and p(w1|w2) could be calculated, calculate p(w2|Synset(w1)) and P(w1|Synset(w2))
+             */
+            //
+            if (lll) {
+                String categW1 = "";
+                String categW2 = "";
+
+                if (w1t1[1].startsWith("NN") || w1t1[1].startsWith("nn")) {
+                    categW1 = "NOUN";
+                } else if (w1t1[1].startsWith("JJ") || w1t1[1].startsWith("jj")) {
+                    categW1 = "ADJECTIVE";
+                } else if (w1t1[1].startsWith("VB") || w1t1[1].startsWith("vb")) {
+                    categW1 = "VERB";
+                    
+                /* I map other categories such as RB to NN because there are only a few adverbs in WordNet
+                   and there are a few adverbs in my data (e.g. back in back pain)
+                */
+                }else{
+                    categW1 = "NOUN";
+                }
+
+                if (w2t2[1].startsWith("NN") || w2t2[1].startsWith("nn")) {
+                    categW2 = "NOUN";
+                } else if (w2t2[1].startsWith("JJ") || w2t2[1].startsWith("jj")) {
+                    categW2 = "ADJECTIVE";
+                } else if (w2t2[1].startsWith("VB") || w2t2[1].startsWith("vb")) {
+                    categW2 = "VERB";
+                }else{
+                    
+                /* I map other categories such as RB to NN because there are only a few adverbs in WordNet
+                   and there are a few adverbs in my data (e.g. back in back pain)
+                */
+                    categW2 = "NOUN";
+                }
+
+                SynsetfromWN OBJ1 = new SynsetfromWN();
+                //W1synonyms does not contain W1
+                List<String> W1synonyms = OBJ1.ReturnSyns(w1t1[0], categW1);
+                //W2synonyms does not contain W2
+                List<String> W2synonyms = OBJ1.ReturnSyns(w2t2[0], categW2);
+
+                //========================================                
+                //============ TEST BLOCK ===============
+                //========================================
+//                if(NC.equals("sliced onions")){
+//                    System.out.println(NC+ " "+ "w1t1[1]: "+w1t1[1]+" --> "+categ);
+//                    System.out.println("-----------------------");
+//                    System.out.println("No synonyms numOfProcessed for: "+w1t1[0]+ " category: "+categ);
+//                }
+                //========================================
+                //=========== END OF TEST ================
+                //========================================
+
+                
+                
+                double pw1Synw2Sigma = 0;
+                double pw2Synw1Sigma = 0;
+
+                //=============================================
+                //======== Sum of all P(w2|Synset(w1)) =======
+                //=============================================
+                for (String o : W1synonyms) {
+                    String compound = o + " " + w2t2[0];
+                    if (bigramHM.containsKey(compound) && unigramHM.containsKey(o)) {
+                        pw2Synw1Sigma += ((double) bigramHM.get(compound) / (double) unigramHM.get(o));   
+                    }
+                }
+                
+                
+                
+                
+                
+                
+                //=====================================================
+                //======== Sum of all P(w1|Synset(w2)) =======
+                //=====================================================
+                for (String o : W2synonyms) {
+                    String compound = w1t1[0] + " " + o;
+                    if (bigramHM.containsKey(compound) && unigramHM.containsKey(o)) {
+                        pw1Synw2Sigma += ((double) bigramHM.get(compound) / (double) unigramHM.get(o));  
+                    } 
+                }
+                //====================================================
+                //====================================================
+                //====================================================
+
+                
+               
+
+                //w/o smoothing
+                Pw1SynsetW2 = pw1Synw2Sigma;
+                Pw2SynsetW1 = pw2Synw1Sigma;
+                
+                
+
+                //System.out.println(NC + " " + PW1W2 + " " + PW2W1 + " " + Pw1SynsetW2 + " " + Pw2SynsetW1);
+
+                Double[] tmpArray = {PW1W2,PW2W1,Pw1SynsetW2,Pw2SynsetW1};
+                results.put(NC, tmpArray);
+                
+               // }
+            } else {
+                /*
+                 w1 or w2 did not exist in the unigramHM for this NC
+                 */
+
+                //System.out.println(NC + " -1 -1 -1 -1");
+                Double[] tmpArray = {-1.0,-1.0,-1.0,-1.0};
+                results.put(NC, tmpArray);
+            }
+        }
+        return results;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException{
 
             //reading list of candidates
         System.out.println("Readin candidates...");
             BufferedReader candidateFile = new BufferedReader(
                     new InputStreamReader(
-                            new FileInputStream("/Users/svm/Resources/DATA/WN-Syn-Based/eval_farahmand/eval_instances_pos_avail.csv"), "UTF8"));
+                            new FileInputStream("/Users/svm/Resources/DATA/WN-Syn-Based/LowerCased/SCH/instance_files/filt/instances_filt_pos.csv"), "UTF8"));
+            
+            ///Users/svm/Resources/DATA/VGI/ac.nc.all.pos.txt
+            
             LinkedHashMap<String,Integer> posCandLinkedMap = new LinkedHashMap<>();
             String Entry = "";
             Pattern entryETlabel = Pattern.compile("(\\w+_\\w+\\s\\w+_\\w+)\\s(\\d+)$");
@@ -328,12 +573,11 @@ public class Collocational_Prob_Bidirect_v8 {
                 }
             }
             
-            
         //reading unigrams
         System.out.println("Reading unigrams...");
         BufferedReader allunigrams = new BufferedReader(
                 new InputStreamReader(
-                        new FileInputStream("/Users/svm/Resources/corpora/WIKI-2015/lex/lex-gte-1.txt"), "UTF8"));
+                        new FileInputStream("/Users/svm/Resources/corpora/WIKI-2015/Lowercased/lex/lex-gte-1.txt"), "UTF8"));
         
         
         HashMap<String, Integer> unigramsMap = new HashMap<String, Integer>();
@@ -362,7 +606,7 @@ public class Collocational_Prob_Bidirect_v8 {
         
         BufferedReader allBigrams = new BufferedReader(
                 new InputStreamReader(
-                        new FileInputStream("/Users/svm/Resources/corpora/WIKI-2015/2-grams/2-grams-gte-1.txt"), "UTF8"));
+                        new FileInputStream("/Users/svm/Resources/corpora/WIKI-2015/Lowercased/nsp/bigrams_all_extract_by_nsp_from_lower.txt"), "UTF8"));
 
         HashMap<String, Integer> bigramMap = new HashMap<String, Integer>();
         String bi = "";
@@ -384,18 +628,19 @@ public class Collocational_Prob_Bidirect_v8 {
         System.out.println("calculateSynBasedProbs...");
         Collocational_Prob_Bidirect_v8 cpb = new Collocational_Prob_Bidirect_v8(posCandLinkedMap, unigramsMap, bigramMap);
         
+        LinkedHashMap<String,Double[]> r = cpb.calculateSynBasedProbs_v2(false);
         
-        LinkedHashMap<String,Double[]> r = cpb.calculateSynBasedProbs(true);
-        
-        
+        System.out.println("wn_synbased_12\twn_synbased_21");
         DecimalFormat df = new DecimalFormat("0.0000000");
         for(String s : r.keySet()){
             //System.out.println(s+" "+df.format(r.get(s)[0]) + " "+df.format(r.get(s)[1])+" "+df.format(r.get(s)[2])+" "+df.format(r.get(s)[3]));
+            
             System.out.println(df.format(r.get(s)[0]) + " "+df.format(r.get(s)[1])+" "+df.format(r.get(s)[2])+" "+df.format(r.get(s)[3]));
             
-        }
-        
-                
+//            double delta_12 = r.get(s)[0] - r.get(s)[2];
+//            double delta_21 = r.get(s)[1] - r.get(s)[3];
+//            System.out.println( df.format(delta_21) +"\t"+df.format(delta_12));
+              
+        }         
     }
-
 }

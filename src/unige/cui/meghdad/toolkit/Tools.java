@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -135,8 +136,8 @@ public class Tools {
                 System.out.println("-----------------------------------");
 
             }
-            
-            System.out.println("SIZE OF HC: "+hc.size());
+
+            System.out.println("SIZE OF HC: " + hc.size());
 
             //reproduce the POS tagged compound with most frequent tags
             String[] tags = hc.get(ngr).getTags().get(ind_max).split(" ");
@@ -156,65 +157,41 @@ public class Tools {
         return outMap;
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     /**
-     * 
-     * Method to merge the POS tags of the input HashMap of pos tagged 
-     * word pairs and their frequency. 
-     * 
-     * The method can be used to merge the compounds that are tagged differently. 
-     * e.g. bank_NN account_NN or bank_NN account_NNP
-     * 
+     *
+     * Method to merge the POS tags of the input HashMap of pos tagged word
+     * pairs and their frequency.
+     *
+     * The method can be used to merge the compounds that are tagged
+     * differently. e.g. bank_NN account_NN or bank_NN account_NNP
+     *
      * @param input HashMap<String, Integer>: asphalt_nn emulsions_nns 2
      * @return HashMap<String, Integer>: asphalt emulsions 2
      */
-    
-    
-    
- 
     //============================================================================
     //============================================================================
     public HashMap MergePosTags(HashMap<String, Integer> input) {
 
-        
         //output
         HashMap<String, Integer> outMap = new HashMap<String, Integer>();
-        
-        
+
         for (String k : input.keySet()) {
             String[] elements = k.split("[ _]");
-            
-            String pairForm = elements[0]+" "+elements[2];
+
+            String pairForm = elements[0] + " " + elements[2];
             int pairFreq = input.get(k);
-            
-            if(!outMap.containsKey(pairForm)){
+
+            if (!outMap.containsKey(pairForm)) {
                 outMap.put(pairForm, pairFreq);
-            }else{
+            } else {
                 int prevFreq = outMap.get(pairForm);
-                int newFreq = prevFreq+pairFreq;
+                int newFreq = prevFreq + pairFreq;
                 outMap.put(pairForm, newFreq);
             }
         }
         return outMap;
     }
-    
-   
-     
-    
+
     //============================================================================
     //============================================================================
     /**
@@ -354,19 +331,19 @@ public class Tools {
         return ret;
     }
 
-    
     /**
-     * 
-     * Extract the list of n-grams from (pos-tagged) corpus. 
-     * Generates either pos-tagged or plain n-grams.
+     *
+     * Extract the list of n-grams from (pos-tagged) corpus. Generates either
+     * pos-tagged or plain n-grams.
      *
      * @param p2corpus path to corpus
-     * @param freqThreshold n-grams below this threshold will be discarded in the output. 
+     * @param freqThreshold n-grams below this threshold will be discarded in
+     * the output.
      * @param order order (n) of the n-gram
      * @param isCorpusPosTagged is the input corpus pos-tagged?
      * @param ignoreCase ignore case?
      * @param outputPosTagged should the output be pos-tagged or plain n-grams?
-     * 
+     *
      * @return HashMap containing plain OR pos tagged n-grams
      *
      * @throws UnsupportedEncodingException
@@ -374,7 +351,6 @@ public class Tools {
      * @throws IOException
      */
     public HashMap<String, Integer> ExtractNgrams(String p2corpus, int freqThreshold, int order, boolean isCorpusPosTagged, boolean outputPosTagged, boolean ignoreCase) throws UnsupportedEncodingException, FileNotFoundException, IOException {
-
 
         if (isCorpusPosTagged) {
 //            System.out.println("Corpus format: POS Tagged");
@@ -393,7 +369,7 @@ public class Tools {
         BufferedReader corpus = new BufferedReader(
                 new InputStreamReader(
                         new FileInputStream(p2corpus), "UTF8"));
-        
+
         String sentence;
         int c = 0;
 
@@ -404,14 +380,11 @@ public class Tools {
                 sentence = sentence.toLowerCase();
             }
 
-            
             //Extract n-grams from sentence
             //for each n-gram extracted by NgExtract ReturnNgrams() method
             //NgExtract inter = new NgExtract();
             //for (String ng : inter.ReturnNgrams(order, sentence)){
             //}
-        
-            
             //more memory efficient approach to extract n-grams from sentence
             String[] unigrams = sentence.split(" ");
             if (unigrams.length >= 100) {
@@ -432,7 +405,6 @@ public class Tools {
 
             }
 
-            
             //transform the list of all n-grams to HashMap of n-grams and their count
             for (String ngram : ngs) {
 
@@ -444,14 +416,13 @@ public class Tools {
                 }
             }
 
-
             c++;
             if ((c % 1000000) == 0) {
 
                 long estimatedTime = System.nanoTime() - start;
                 start = System.nanoTime();
                 System.out.println("Processing Line: " + c);
-                
+
                 //force garbage collection
                 //System.gc();
             }
@@ -463,27 +434,25 @@ public class Tools {
 
         if (outputPosTagged && isCorpusPosTagged) {
             returnNgs = allNgs;
-        } else if(!outputPosTagged && isCorpusPosTagged) {
+        } else if (!outputPosTagged && isCorpusPosTagged) {
 
             for (String ngpos : allNgs.keySet()) {
                 Matcher m = p.matcher(ngpos);
                 if (m.find()) {
-                    if (!returnNgs.containsKey(m.group(1)+" "+m.group(2))) {
-                        returnNgs.put(m.group(1)+" "+m.group(2), 1);
+                    if (!returnNgs.containsKey(m.group(1) + " " + m.group(2))) {
+                        returnNgs.put(m.group(1) + " " + m.group(2), 1);
                     } else {
-                        int tmp = returnNgs.get(m.group(1)+" "+m.group(2));
-                        returnNgs.put(m.group(1)+" "+m.group(2), ++tmp);
+                        int tmp = returnNgs.get(m.group(1) + " " + m.group(2));
+                        returnNgs.put(m.group(1) + " " + m.group(2), ++tmp);
                     }
                 }
             }
-        }else if(outputPosTagged && !isCorpusPosTagged){
+        } else if (outputPosTagged && !isCorpusPosTagged) {
             System.out.println("Can't return postagged n-grams from un-tagged corpus. Returning plain n-grams.");
             returnNgs = allNgs;
-        }else if(!outputPosTagged && !isCorpusPosTagged){
+        } else if (!outputPosTagged && !isCorpusPosTagged) {
             returnNgs = allNgs;
         }
-
-
 
         //apply frequency threshold
         System.out.println("Applying frequency threshold...");
@@ -494,7 +463,6 @@ public class Tools {
                 it1.remove();
             }
         }
-
 
         System.out.println("Returning Map of Ngramgs.");
         return returnNgs;
@@ -520,7 +488,7 @@ public class Tools {
      */
     //============================================================================
     //============================================================================
-    public HashMap extractNCs(String p2corpus, String SyntacticPattern, boolean igCase) throws FileNotFoundException, IOException {
+    public HashMap extractNCs(String p2corpus, String SyntacticPattern, boolean igCase, boolean withPOS, int freqThreshold) throws FileNotFoundException, IOException {
 
 //        System.out.println();
 //        System.out.println("extractNCs()");
@@ -552,7 +520,7 @@ public class Tools {
         int sent_count = 0;
         String l = "";
         while ((l = corpus.readLine()) != null) {
-            
+
             sent_count++;
             if ((sent_count % 1000000) == 0) {
                 System.out.println("Processing line: " + sent_count);
@@ -560,11 +528,19 @@ public class Tools {
             Matcher m_nc = cmpPat.matcher(l);
             while (m_nc.find()) {
 
-                //output without POS tags
-                //String cat = m_nc.group(1).toLowerCase() + " " + m_nc.group(3).toLowerCase();
+                String cat = "";
+
                 //output with POS tags
-                //String cat = m_nc.group(1).toLowerCase() + "_" + m_nc.group(2) + " " + m_nc.group(3).toLowerCase() + "_" + m_nc.group(4);
-                String cat = m_nc.group(1) + "_" + m_nc.group(2) + " " + m_nc.group(3) + "_" + m_nc.group(4);
+                if (withPOS) {
+
+                    cat = m_nc.group(1) + "_" + m_nc.group(2) + " " + m_nc.group(3) + "_" + m_nc.group(4);
+
+                    //output without POS tags
+                } else {
+
+                    cat = m_nc.group(1) + " " + m_nc.group(3);
+
+                }
 
                 if (igCase) {
                     cat = cat.toLowerCase();
@@ -584,12 +560,17 @@ public class Tools {
                 }
             }
         }
-        
-        
+
+        //filtering based on frequency:
+        if (freqThreshold > 1) {
+            Iterator<Entry<String, Integer>> it = NCs.entrySet().iterator();
+            while (it.hasNext()) {
+                Entry<String, Integer> entry = it.next();
+                if (entry.getValue() < freqThreshold) {
+                    it.remove();
+                }
+            }
+        }
         return NCs;
     }
-    
-    
-    
-    
 }

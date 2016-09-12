@@ -227,7 +227,8 @@ public class RunCollocBidirect_v3 {
             System.out.println();
             System.out.println("Creating a candidate set (pattern: " + mwePat + ")...");
             
-            posCandidMap = T.extractNCs(cmd.getOptionValue("p2corpus"), mwePat, ignoreCase);
+            posCandidMap = T.extractNCs(cmd.getOptionValue("p2corpus"), mwePat, ignoreCase,true,10);
+            
             //Transforming frequencies to -1:
             //posCandidMap is originally a map of candidates and their labels but extractNCs
             //returns a set of NCs and their frequencies. We only need the NCs 
