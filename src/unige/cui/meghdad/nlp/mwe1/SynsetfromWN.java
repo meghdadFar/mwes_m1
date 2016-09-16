@@ -1,5 +1,5 @@
 
-package unige.cui.meghdad.nlp.collocation;
+package unige.cui.meghdad.nlp.mwe1;
 
 import edu.smu.tspell.wordnet.*;
 import java.util.ArrayList;
@@ -92,8 +92,7 @@ public class SynsetfromWN {
                 }
                 //System.out.println("Number of synosyms: "+allSynonyms.size());
             } else {
-//                System.err.println("No synsets exist that contain "
-//                        + "the word form '" + wordForm + "'");
+                //System.err.println("No synsets exist that contain '" + wordForm + "'");
             }
             
         //word form always exists in the synset, so we need to cut it out
