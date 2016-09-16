@@ -3,7 +3,7 @@
 Introduction:
 =======================================================
 
-The unige.cui.meghdad.nlp.mwe1 package implements a model of extracting two-word multiword expressions (MWEs) or collocations based on non-substitutability criterion. Non-substitutability means that the components of a MWE can not be replaced with their near synonyms. For instance "swimming pool" can not be rephrased as "swimming pond" although the latter is a semantically and syntactically plausible alternative. Efficient extraction of MWEs can improve the performance of several other NLP tasks such as IE, parsing, topic models and sentiment analysis. 
+The `unige.cui.meghdad.nlp.mwe1` package implements a model of extracting two-word multiword expressions (MWEs) or collocations based on non-substitutability criterion. Non-substitutability means that the components of a MWE can not be replaced with their near synonyms. For instance "swimming pool" can not be rephrased as "swimming pond" although the latter is a semantically and syntactically plausible alternative. Efficient extraction of MWEs can improve the performance of several other NLP tasks such as IE, parsing, topic models and sentiment analysis. 
 
 For more information about non-substitutability see: 
 
@@ -11,7 +11,7 @@ For more information about non-substitutability see:
 
 - Pearce, Darren. "Synonymy in collocation extraction." Proceedings of the workshop on WordNet and other lexical resources, second meeting of the NAACL. 2001). 
 
-unige.cui.meghdad.nlp.mwe1 with some modifications implements the model presented at: Farahmand, Meghdad, and Joakim Nivre. "Modeling the Statistical Idiosyncrasy of Multiword Expressions." Proceedings of NAACL-HLT. 2015. (ONLY BIDIRECTIONAL MODEL IS AVAILABLE IN THIS RELEASE).
+`unige.cui.meghdad.nlp.mwe1` with some modifications implements the model presented at: Farahmand, Meghdad, and Joakim Nivre. "Modeling the Statistical Idiosyncrasy of Multiword Expressions." Proceedings of NAACL-HLT. 2015. (ONLY BIDIRECTIONAL MODEL IS AVAILABLE IN THIS RELEASE).
 
 Note
 =======================================================
@@ -31,13 +31,13 @@ The program can be used in two ways.
 Here, path to the POS tagged corpus must be provided through "-p2corpus" option. 
 Other flags that are optional include:
 
--maxRank Indicaates the n top ranked MWEs that will be returned. Defaul=200. 
+`-maxRank` Indicaates the n top ranked MWEs that will be returned. Defaul=200. 
 
--rc Ranking criteria: delta_12, delta_21, or combined. Default = delta_21. 
+`-rc` Ranking criteria: delta_12, delta_21, or combined. Default = delta_21. 
 
 #### Example:
 
-java -cp dist/cui-mf-nlp-mwe-m1.jar unige.cui.meghdad.nlp.mwe1.Collocational_Bidirect_Prob_Corpus -p2corpus "PATH_2_POSTAGGED_CORPUS"
+`java -cp dist/cui-mf-nlp-mwe-m1.jar unige.cui.meghdad.nlp.mwe1.Collocational_Bidirect_Prob_Corpus -p2corpus "PATH_2_POSTAGGED_CORPUS"`
 
 
 #### 2. To rank a list of MWE candidates that are provided in an input file. 
@@ -45,11 +45,11 @@ java -cp dist/cui-mf-nlp-mwe-m1.jar unige.cui.meghdad.nlp.mwe1.Collocational_Bid
 Here, path to the list of POS tagged two-word candidates (through -p2POSTaggedCandidates), path to a list of all bigrams (through -p2bigrams) and all unigrams (through -p2unigrams) extracted from the corpus must be provided.
 Other flags that are optional include:
 
--rc Ranking criteria: delta_12, delta_21, or combined. Default = delta_21.
+`-rc` Ranking criteria: delta_12, delta_21, or combined. Default = delta_21.
 
 #### Example:
 
-java -cp dist/cui-mf-nlp-mwe-m1.jar unige.cui.meghdad.nlp.mwe1.Collocational_Bidirect_Prob_File -p2POSTaggedCandidates "PATH_2_POSTAGGED_CANDIDATES" -p2bigrams "PATH_2_BIGRAMS" -p2unigrams "PATH_2_UNIGRAMS"
+`java -cp dist/cui-mf-nlp-mwe-m1.jar unige.cui.meghdad.nlp.mwe1.Collocational_Bidirect_Prob_File -p2POSTaggedCandidates "PATH_2_POSTAGGED_CANDIDATES" -p2bigrams "PATH_2_BIGRAMS" -p2unigrams "PATH_2_UNIGRAMS"`
 
 -------------------------------------------------------
 
