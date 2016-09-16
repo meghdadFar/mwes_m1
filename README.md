@@ -31,9 +31,10 @@ The program can be used in two ways.
 Here, path to the POS tagged corpus must be provided through "-p2corpus" option. 
 Other flags that are optional include:
 
-`-maxRank` Indicaates the n top ranked MWEs that will be returned. Defaul=200. 
+`-maxRank` Indicates the top n ranked MWEs that will be returned. Defaul=200. 
 
-`-rc` Ranking criteria: delta_12, delta_21, or combined. Default = delta_21. 
+`-rc` Ranking criterion: delta_12, delta_21, or combined. Default = delta_21. 
+(for more information about the criteria see the article). 
 
 #### Example:
 
