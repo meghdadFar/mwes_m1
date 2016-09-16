@@ -68,8 +68,6 @@ public class Collocational_Bidirect_Prob_Corpus {
      * Method to return p(w1|w2), p(w2|w1), p(w1|syn(w2)) and p(w2|syn(w1)) for
      * posLabeledCandidates.
      *
-     * In this version I corrected the calculation of p(w1|syn(w2)) and
-     * p(w2|syn(w1)) probabilities.
      *
      *
      * @param igCase ignore case
@@ -120,8 +118,6 @@ public class Collocational_Bidirect_Prob_Corpus {
 
             //create untagged bigram
             String NC = w1t1[0] + " " + w2t2[0];
-            //System.out.println(NC);
-
             /*
              calculate PW1W2 and PW2W1.
              lll is flag to show wether or not p(w2|w1) and p(w1|w2) could be created. i.e., w1 and w2 
@@ -130,9 +126,6 @@ public class Collocational_Bidirect_Prob_Corpus {
             boolean lll = false;
             if (unigramHM.containsKey(w1t1[0])
                     && unigramHM.containsKey(w2t2[0])) {
-//                System.out.println(NC+" was numOfProcessed in bigram list");
-//                System.out.println(w1t1[0]+" was numOfProcessed in unigram list");
-
                 Lnumw2w1 = posCandList.get(NCetTags);
                 Lnumw1w2 = Lnumw2w1;
 
@@ -140,57 +133,45 @@ public class Collocational_Bidirect_Prob_Corpus {
                 Ldenumw1w2 = unigramHM.get(w2t2[0]);
 
                 if ((Lnumw2w1 <= Ldenumw2w1) && (Lnumw1w2 <= Ldenumw1w2)) {
-
-                    
                     /*
-                    maximum likelihood estimation for P(w2|w1) and P(w1|w2)
-                    smoothing:
-                    PW2W1 = (double) (Lnumw2w1+1.0) / (double) (Ldenumw2w1 + bigramHM.size());
-                    PW1W2 = (double) (Lnumw1w2+1.0) / (double) (Ldenumw1w2 +bigramHM.size());
-                    */
-                    
-                    
+                     maximum likelihood estimation for P(w2|w1) and P(w1|w2)
+                     smoothing:
+                     PW2W1 = (double) (Lnumw2w1+1.0) / (double) (Ldenumw2w1 + bigramHM.size());
+                     PW1W2 = (double) (Lnumw1w2+1.0) / (double) (Ldenumw1w2 +bigramHM.size());
+                     */
                     //w/o smoothing
                     PW2W1 = (double) (Lnumw2w1) / (double) (Ldenumw2w1);
                     PW1W2 = (double) (Lnumw1w2) / (double) (Ldenumw1w2);
 
                     lll = true;
 
-                } else{
-                    
+                } else {
+
                     /*
+                     (B)
+                     The numerator of PW2W1 or PW1W2 was greater than its denominator.
+                     This could have happen due to regex inconsistencies while retrieving 
+                     words and candidates. For instance one problematic example was:
                     
-                    (B)
+                     hondt_nn method_nn
                     
-                    The numerator of PW2W1 or PW1W2 was greater than its denominator.
-                    This could have happen due to regex inconsistencies while retrieving 
-                    words and candidates. For instance one problematic example was:
+                     It is extracted from: d'hondt_nn method_nn
                     
-                    hondt_nn method_nn
+                     The nn-nn extractor implementation identifies it as a compound, 
+                     but the unigram extractor does not identify hondt as a word 
+                     (being part of d'hondt). 
                     
-                    It is extracted from: d'hondt_nn method_nn
-                    
-                    The nn-nn extractor implementation identifies it as a compound, 
-                    but the unigram extractor does not identify hondt as a word 
-                    (being part of d'hondt). 
-                    
-                    If such cases happen, in this if block nothing will be executed. 
-                    In the else block flas lll will become false. 
-                    
-                    */
-                    
+                     If such cases happen, in this if block nothing will be executed. 
+                     In the else block flas lll will become false. 
+                     */
                 }
-
             } else {
-
                 /*
-                
-                Either (B) occured,
-                or either of w1 or w2 were not found in the corpus therefore 
-                division by zero due to unavailble denominator count occured.
+                 Either (B) occured,
+                 or either of w1 or w2 were not found in the corpus therefore 
+                 division by zero due to unavailble denominator count occured.
                  */
                 lll = false;
-
             }
             /*
              if the p(w2|w1) and p(w1|w2) could be calculated (lll==true), calculate p(w2|Synset(w1)) and P(w1|Synset(w2))
@@ -236,65 +217,75 @@ public class Collocational_Bidirect_Prob_Corpus {
                 double pw1Synw2 = 0;
                 double pw2Synw1 = 0;
 
-                
-                
                 /*
-                Continue the calculation of the probabilities if synsets are not empty. 
-                If they are empty, for this compound, this method is not conclusive. 
-                Therefore the NC will be discarded. 
-                */
-                if((W1synonyms.size() > 0) && (W2synonyms.size() > 0)){
-                    
-               
-                
-                //=============================================
-                //======== Sum of all P(w2|Synset(w1)) ========
-                //=============================================
-                double numW2SynW1 = 0;
-                double denumW2SynW1 = 0;
-                for (String o : W1synonyms) {
-                    String compound = o + " " + w2t2[0];
-                    if (bigramHM.containsKey(compound) && unigramHM.containsKey(o)) {
-                        denumW2SynW1 += (double) unigramHM.get(o);
-                        numW2SynW1 += (double) bigramHM.get(compound);
-                    }
-                }
-                if (denumW2SynW1 != 0) {
-                    pw2Synw1 = numW2SynW1 / denumW2SynW1;;
-                } else {
-                    pw2Synw1 = 0;
-                }
+                 Continue the calculation of the probabilities if synsets are not empty. 
+                 If they are empty, for this compound, this method is not conclusive. 
+                 Therefore the NC will be discarded. 
+                 */
+                if ((W1synonyms.size() > 0) && (W2synonyms.size() > 0)) {
 
-                //=============================================
-                //======== Sum of all P(w1|Synset(w2)) ========
-                //=============================================
-                numW2SynW1 = 0;
-                denumW2SynW1 = 0;
-                for (String o : W2synonyms) {
-                    String compound = w1t1[0] + " " + o;
-                    if (bigramHM.containsKey(compound) && unigramHM.containsKey(o)) {
-                        denumW2SynW1 += (double) unigramHM.get(o);
-                        numW2SynW1 += (double) bigramHM.get(compound);
-                    }
-                }
-                if (denumW2SynW1 != 0) {
-                    pw1Synw2 = numW2SynW1 / denumW2SynW1;;
-                } else {
-                    pw1Synw2 = 0;
-                }
-                //=============================================
-                //=============================================
-
-                Double[] tmpArray = {PW1W2, PW2W1, pw1Synw2, pw2Synw1};
-                results.put(NC, tmpArray);
-                
-                }else{
                     
                     /*
-                    WN synsets was not found for either w1 or w2, therefore, this method 
-                    can not generate a score and sbsequently a rank for this NC. 
-                    This NC will be discarded and will not be added to the results. 
+                    Use of W1/2synFoundInCorpus:
+                    Were at least one of the synonyms of W1 and W2 found in the corpus?
+                    If not, the method is not able to calculate the 
+                    non-substitutability score for this NC. 
                     */
+                    boolean W1synFoundInCorpus = false;
+                    boolean W2synFoundInCorpus = false;
+                    //=============================================
+                    //============= P(w2|Synset(w1)) ==============
+                    //=============================================
+                    double numW2SynW1 = 0;
+                    double denumW2SynW1 = 0;
+                    for (String o : W1synonyms) {
+                        String compound = o + " " + w2t2[0];
+                        if (bigramHM.containsKey(compound) && unigramHM.containsKey(o)) {
+                            denumW2SynW1 += (double) unigramHM.get(o);
+                            numW2SynW1 += (double) bigramHM.get(compound);
+                        }
+                    }
+                    if (denumW2SynW1 != 0) {
+                        pw2Synw1 = numW2SynW1 / denumW2SynW1;
+                        W1synFoundInCorpus = true;
+                    } else 
+
+                    //=============================================
+                    //============= P(w1|Synset(w2)) ==============
+                    //=============================================
+                    numW2SynW1 = 0;
+                    denumW2SynW1 = 0;
+                    for (String o : W2synonyms) {
+                        String compound = w1t1[0] + " " + o;
+                        if (bigramHM.containsKey(compound) && unigramHM.containsKey(o)) {
+                            denumW2SynW1 += (double) unigramHM.get(o);
+                            numW2SynW1 += (double) bigramHM.get(compound);
+                        }
+                    }
+                    if (denumW2SynW1 != 0) {
+                        pw1Synw2 = numW2SynW1 / denumW2SynW1;
+                        W2synFoundInCorpus = true;
+                    } 
+                    //=============================================
+                    //=============================================
+
+                    if(W1synFoundInCorpus && W2synFoundInCorpus){
+                        Double[] tmpArray = {PW1W2, PW2W1, pw1Synw2, pw2Synw1};
+                        results.put(NC, tmpArray);
+                    }else{
+                        /*
+                        None of the synonyms of W1 and W2 were observed in the corpus.
+                        Thereofre, the non-substitutability score cannot be computed. 
+                        Thus, this NC will be discarded. 
+                        */
+                    }
+
+                } else {
+                    /*
+                     WN synsets was not found for either w1 or w2, therefore, this method 
+                     can not generate a score and sbsequently a rank for this NC. 
+                     This NC will be discarded and will not be added to the results. 
+                     */
                 }
 
             } else {
@@ -302,14 +293,12 @@ public class Collocational_Bidirect_Prob_Corpus {
                  PW2W1 or PW1W2 could not be calculated for this NC. 
                  */
 
-                
                 /*
-                Uncomment the following if all of the elements of the candidate set 
-                need to be present. The following statement assign probabilities such that after
-                being ranked, these elements (for which PW2W1 or PW1W2) could not be calculated
-                stay at the bottom of the ranked list. 
-                */
-                
+                 Uncomment the following if all of the elements of the candidate set 
+                 need to be present. The following statement assign probabilities such that after
+                 being ranked, these elements (for which PW2W1 or PW1W2) could not be calculated
+                 stay at the bottom of the ranked list. 
+                 */
 //                Double[] tmpArray = {-5.0, -5.0, 0, 0};
 //                results.put(NC, tmpArray);
             }
