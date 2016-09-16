@@ -26,7 +26,7 @@ Command Line Quick Start
  
 The program can be used in two ways. 
 
-#### 1. To generate a ranked list of MWEs that are directly extracted from corpus. 
+### 1. To generate a ranked list of MWEs that are directly extracted from corpus. 
 
 Here, path to the POS tagged corpus must be provided through "-p2corpus" option. 
 Other flags that are optional include:
@@ -40,7 +40,7 @@ Other flags that are optional include:
 `java -cp dist/cui-mf-nlp-mwe-m1.jar unige.cui.meghdad.nlp.mwe1.Collocational_Bidirect_Prob_Corpus -p2corpus "PATH_2_POSTAGGED_CORPUS"`
 
 
-#### 2. To rank a list of MWE candidates that are provided in an input file. 
+### 2. To rank a list of MWE candidates that are provided in an input file. 
 
 Here, path to the list of POS tagged two-word candidates (through -p2POSTaggedCandidates), path to a list of all bigrams (through -p2bigrams) and all unigrams (through -p2unigrams) extracted from the corpus must be provided.
 Other flags that are optional include:
