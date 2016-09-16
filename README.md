@@ -51,12 +51,6 @@ Other flags that are optional include:
 
 `java -cp dist/cui-mf-nlp-mwe-m1.jar unige.cui.meghdad.nlp.mwe1.Collocational_Bidirect_Prob_File -p2POSTaggedCandidates "PATH_2_POSTAGGED_CANDIDATES" -p2bigrams "PATH_2_BIGRAMS" -p2unigrams "PATH_2_UNIGRAMS"`
 
--------------------------------------------------------
-
-For evaluation (-evalMode 1) -p2e, -p2lex, -p2bigr, -labels, -maxAlpha, -minAlpha, -step must be set. See below for description of these and other available options. Change directory to the directory of cui-mf-nlp.jar and execute the following command:
-
-java -cp cui-mf-nlp.jar unige.cui.meghdad.nlp.mwe1.RunCollocBidirect_v3 -p2corpus path-to-corpus -evalMode 1 -p2e path_2_examples -labels path_2_labels -maxAlpha 10 -minAlpha 2 -step 2
-
 
 Contact:
 =======================================================
