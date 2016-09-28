@@ -1,5 +1,7 @@
 # mwes_m1
 
+Java implementation of an MWE identification method (only two word noun compound category) that is based on the non-substitutability of MWEs.
+
 Introduction:
 =======================================================
 
