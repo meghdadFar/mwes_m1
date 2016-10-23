@@ -328,11 +328,12 @@ public class Collocational_Bidirect_Prob_File {
     
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException, ParseException {
 
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-        //\\//\\//\\//\\//\\//\\  COMMAND LINE ARGUMENTS //\\//\\//\\//\\//\\//
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\ 
+        //======================================================================
+        //======================  COMMAND LINE ARGUMENTS =======================
+        //======================================================================
+        
         //use apache commons CLI to parse command line arguments
-        // create Options object
+        //create Options object
         Options options = new Options();
 
         //required options:
@@ -361,8 +362,8 @@ public class Collocational_Bidirect_Prob_File {
         if (cmd.hasOption("rc")) {
             rc = cmd.getOptionValue("rc");
         }
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\\\//\\//\\//
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+        //======================================================================
+        //======================================================================
 
         String p2bigrams = cmd.getOptionValue("p2bigrams");
         String p2unigrams = cmd.getOptionValue("p2unigrams");
@@ -374,7 +375,7 @@ public class Collocational_Bidirect_Prob_File {
                 new InputStreamReader(
                         new FileInputStream(p2POSTaggedCandidates), "UTF8"));
 
-            //farahmad
+        //farahmad
         ///Users/svm/Resources/DATA/WN-Syn-Based/LowerCased/FAR/eval_farahmand/eval_instances_pos_avail.csv
         //schneider
         ///Users/svm/Resources/DATA/WN-Syn-Based/LowerCased/SCH/instance_files/filt/instances_filt_pos.csv

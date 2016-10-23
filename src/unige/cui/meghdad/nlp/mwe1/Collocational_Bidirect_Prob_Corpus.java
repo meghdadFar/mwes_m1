@@ -323,9 +323,10 @@ public class Collocational_Bidirect_Prob_Corpus {
 
     public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException, ParseException {
 
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
-        //\\//\\//\\//\\//\\//\\  COMMAND LINE ARGUMENTS //\\//\\//\\//\\//\\//
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\ 
+        //======================================================================
+        //======================  COMMAND LINE ARGUMENTS =======================
+        //======================================================================
+        
         //use apache commons CLI to parse command line arguments
         // create Options object
         Options options = new Options();
@@ -353,16 +354,16 @@ public class Collocational_Bidirect_Prob_Corpus {
         if (cmd.hasOption("maxRank")) {
             rc = cmd.getOptionValue("maxRank");
         }
-
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\\\//\\//\\//
-        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+        //======================================================================
+        //======================================================================
+        
         String p2corpus = cmd.getOptionValue("p2corpus");
 
         Tools T = new Tools();
 
         System.out.println("Extracting a set of \"nn-nn\" candidates...");
         LinkedHashMap<String, Integer> posCandidates = new LinkedHashMap<String, Integer>(T.extractNCs(p2corpus, "nn-nn", true, true, 50));
-        //TODO keep only the candiddates that have at least one synonym in wordnet
+        //TODO keep only the candiddates whose components that have at least one synonym in wordnet
 
         System.out.println("Extracting 1-grams...");
         HashMap<String, Integer> unigrams = T.ExtractUnigram(p2corpus, 1, true, true).get(0);
